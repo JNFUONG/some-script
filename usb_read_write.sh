@@ -3,7 +3,7 @@
 usage() {
     echo "用法: $0 <设备名> [测试大小(MB)]"
     echo "示例:"
-    echo "  $0 sdb           # 测试sdb设备，默认100MB"
+    echo "  $0 sdb           # 测试sdb设备，默认500MB"
     echo "  $0 sdc 200       # 测试sdc设备，200MB文件"
     echo ""
     echo "当前存储设备:"
@@ -17,7 +17,7 @@ if [ $# -eq 0 ]; then
 fi
 
 usb_device="$1"
-test_size="${2:-100}"  # 默认100MB
+test_size="${2:-500}"  # 默认500MB
 
 # 设备验证
 if [ ! -b "/dev/$usb_device" ]; then
@@ -45,12 +45,12 @@ run_test() {
     
     # 清缓存+写入
     sync && echo 3 > /proc/sys/vm/drop_caches
-    echo "写入测试:"
+    echo "清缓存后，写入测试:"
     dd if=/dev/zero of="$test_file" bs=1M count=$test_size oflag=direct status=progress 2>&1
     
     # 清缓存+读取
     sync && echo 3 > /proc/sys/vm/drop_caches
-    echo "读取测试:"
+    echo "清缓存后，读取测试:"
     dd if="$test_file" of=/dev/null bs=1M count=$test_size iflag=direct status=progress 2>&1
     
     rm -f "$test_file"
